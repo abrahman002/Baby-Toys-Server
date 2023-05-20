@@ -25,6 +25,25 @@ const client = new MongoClient(uri, {
   }
 });
 
+const toyCollection=client.db('babytoy').collection('addatoy')
+
+
+app.post('/addatoy',async(req,res)=>{
+  const addToy=req.body;
+  const result=await toyCollection.insertOne(addToy);
+  res.send(result)
+})
+
+app.get('/addatoy/:text',async(req,res)=>{
+  const toyName=req.params.text;
+  // console.log(toyName)
+  if(toyName == 'Army men' || toyName == 'He-Man' || toyName == 'Lego'){
+    const result=await toyCollection.find({subCategory : toyName}).limit(2).toArray()
+    console.log(result)
+    return res.send(result)
+  }
+})
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
