@@ -1,9 +1,9 @@
 const express = require('express');
-const app=express();
+const app = express();
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const port=process.env.PORT|| 5000;
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const port = process.env.PORT || 5000;
 
 
 // middleware
@@ -25,23 +25,43 @@ const client = new MongoClient(uri, {
   }
 });
 
-const toyCollection=client.db('babytoy').collection('addatoy')
+const toyCollection = client.db('babytoy').collection('addatoy')
 
-
-app.post('/addatoy',async(req,res)=>{
-  const addToy=req.body;
-  const result=await toyCollection.insertOne(addToy);
+app.get('/addatoy', async (req, res) => {
+  let query = {};
+  if (req.query?.email) {
+    query = { email: req.query.email }
+  }
+  const result = await toyCollection.find(query).toArray()
   res.send(result)
 })
 
-app.get('/addatoy/:text',async(req,res)=>{
-  const toyName=req.params.text;
+app.get('/addatoy/:text', async (req, res) => {
+  const toyName = req.params.text;
   // console.log(toyName)
-  if(toyName == 'Army men' || toyName == 'He-Man' || toyName == 'Lego'){
-    const result=await toyCollection.find({subCategory : toyName}).limit(2).toArray()
+  if (toyName == 'Army men' || toyName == 'He-Man' || toyName == 'Lego') {
+    const result = await toyCollection.find({ subCategory: toyName }).limit(2).toArray()
     console.log(result)
     return res.send(result)
   }
+})
+
+app.post('/addatoy', async (req, res) => {
+  const addToy = req.body;
+  const result = await toyCollection.insertOne(addToy);
+  res.send(result)
+})
+
+
+app.delete('/addatoy/:id', async (req, res) => {
+    const id=req.params.id;
+    const query={_id: new ObjectId(id)}
+    const result=await toyCollection.deleteOne(query);
+    res.send(result)
+})
+
+app.put('/addatoy/:id',async(req,res)=>{
+  const updatedToy=req.body;
 })
 
 async function run() {
@@ -60,10 +80,10 @@ run().catch(console.dir);
 
 
 
-app.get('/',(req,res)=>{
-    res.send('Baby Toys Server Is Onnnn')
+app.get('/', (req, res) => {
+  res.send('Baby Toys Server Is Onnnn')
 });
 
-app.listen(port,()=>{
-    console.log(`Server Is running on port ${port}`)
+app.listen(port, () => {
+  console.log(`Server Is running on port ${port}`)
 })
