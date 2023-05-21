@@ -43,14 +43,18 @@ app.get('/addatoy/:id',async(req,res)=>{
     res.send(result)
 })
 
-app.get('/addatoy/:text', async (req, res) => {
-  const toyName = req.params.text;
+app.get('/alltoy',async(req,res)=>{
+  const cursor=toyCollection.find()
+  const result=await cursor.toArray()
+  res.send(result)
+})
+
+app.get('/category/:text', async (req, res) => {
+  const toyName =req.params.text;
   // console.log(toyName)
-  if (toyName == 'Army men' || toyName == 'He-Man' || toyName == 'Lego') {
-    const result = await toyCollection.find({ subCategory: toyName }).limit(2).toArray()
-    console.log(result)
-    return res.send(result)
-  }
+  const query={category:toyName};
+  const result=await toyCollection.find(query).toArray()
+  res.send(result);
 })
 
 app.post('/addatoy', async (req, res) => {
