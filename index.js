@@ -44,7 +44,7 @@ app.get('/addatoy/:id',async(req,res)=>{
 })
 
 app.get('/alltoy',async(req,res)=>{
-  const cursor=toyCollection.find()
+  const cursor=toyCollection.find().limit(20)
   const result=await cursor.toArray()
   res.send(result)
 })
